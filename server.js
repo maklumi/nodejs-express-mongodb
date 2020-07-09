@@ -1,10 +1,13 @@
 const express = require('express')
 const dotenv = require('dotenv')
+const morgan = require('morgan')
+const colors = require('colors')
 const sambunganDB = require('./config/db')
 
+// mesti load env variables dulu
 dotenv.config({ path: './config/config.env' })
-// const logger = require('./middeware/logger')
-const morgan = require('morgan')
+
+// sambungan ke mongo
 sambunganDB()
 
 const app = express()
@@ -18,11 +21,13 @@ app.use('/api/v1/bootcamps', bootcampRoutes)
 
 const pelayan = app.listen(
   PORT,
-  console.log(`Menerima di port ${PORT} dalam mode ${process.env.NODE_ENV}`),
+  console.log(
+    `Menerima di port ${PORT} dalam mode ${process.env.NODE_ENV}`.yellow.bold,
+  ),
 )
 
 process.on('unhandledRejection', (err, promise) => {
-  console.log(`Ada error: ${err.message}`)
+  console.log(`Ada error: ${err.message}`.red)
 
   pelayan.close(() => process.exit(1))
 })

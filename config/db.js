@@ -8,7 +8,7 @@ const sambunganDB = async () => {
     useFindAndModify: false,
   })
 
-  console.log(`MongoDB bersambung: ${conn.connection.host}`)
+  console.log(`MongoDB bersambung: ${conn.connection.host}`.cyan.underline.bold)
 }
 
 module.exports = sambunganDB

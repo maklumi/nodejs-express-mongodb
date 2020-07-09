@@ -3,17 +3,37 @@ const Bootcamp = require('../models/Bootcamp')
 // @desc    Dapatkan semua bootcamps
 // @route   GET /api/v1/bootcamps
 // @access  Public
-exports.dapatkanSemuaBootcamps = (req, res, next) => {
-  res.status(200).json({ berjaya: true, mesej: 'Dapatkan semua bootcamps' })
+exports.dapatkanSemuaBootcamps = async (req, res, next) => {
+  try {
+    const bootcamps = await Bootcamp.find()
+    res.status(200).json({ berjaya: true, data: bootcamps })
+  } catch (err) {
+    res.status(400).json({
+      berjaya: false,
+      mesej: 'Gagal dapatkan semua bootcamps' + err.message,
+    })
+  }
 }
 
 // @desc    Dapatkan satu bootcamp dengan id ini
 // @route   GET /api/v1/bootcamps/:id
 // @access  Public
-exports.dapatkanBootcampDenganId = (req, res, next) => {
-  res
-    .status(200)
-    .json({ berjaya: true, mesej: `Dapatkan bootcamps id ${req.params.id}` })
+exports.dapatkanBootcampDenganId = async (req, res, next) => {
+  try {
+    const bootcamp = await Bootcamp.findById(req.params.id)
+    if (!bootcamp) {
+      return res.status(400).json({
+        berjaya: false,
+        mesej: `Tiada bootcamp dengan id ${req.params.id}`,
+      })
+    }
+    res.status(200).json({ berjaya: true, data: bootcamp })
+  } catch (err) {
+    res.status(400).json({
+      berjaya: false,
+      mesej: 'Gagal dapatkan bootcamp' + err.message,
+    })
+  }
 }
 
 // @desc    Cipta bootcamp

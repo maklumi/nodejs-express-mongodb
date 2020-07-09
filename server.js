@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const colors = require('colors')
+const customErrorHandler = require('./middeware/customerror')
 const sambunganDB = require('./config/db')
 
 // mesti load env variables dulu
@@ -21,6 +22,7 @@ const bootcampRoutes = require('./routes/bootcamps')
 app.use(morgan('dev'))
 
 app.use('/api/v1/bootcamps', bootcampRoutes)
+app.use(customErrorHandler)
 
 const pelayan = app.listen(
   PORT,

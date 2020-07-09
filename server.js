@@ -11,6 +11,9 @@ dotenv.config({ path: './config/config.env' })
 sambunganDB()
 
 const app = express()
+// guna body parser supaya boleh req.body
+app.use(express.json())
+
 const PORT = process.env.PORT || 5000
 
 const bootcampRoutes = require('./routes/bootcamps')

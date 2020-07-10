@@ -8,6 +8,7 @@ dotenv.config({ path: './config/config.env' })
 
 // load models
 const Bootcamp = require('./models/Bootcamp')
+const Course = require('./models/Course')
 
 // connect to db
 mongoose.connect(process.env.URI_MONGO, {
@@ -21,11 +22,15 @@ mongoose.connect(process.env.URI_MONGO, {
 const docs = JSON.parse(
   fs.readFileSync(`${__dirname}/_data/bootcamps.json`, 'utf-8'),
 )
+const dokumenKursus = JSON.parse(
+  fs.readFileSync(`${__dirname}/_data/courses.json`, 'utf-8'),
+)
 
 // masukkan dalam db
 const masukdata = async () => {
   try {
     await Bootcamp.create(docs)
+    await Course.create(dokumenKursus)
     console.log('Data sudah dimasukkan...'.green.inverse)
     process.exit()
   } catch (error) {
@@ -37,6 +42,7 @@ const masukdata = async () => {
 const padamdata = async () => {
   try {
     await Bootcamp.deleteMany()
+    await Course.deleteMany()
     console.log('Data sudah dipadam'.red.inverse)
     process.exit()
   } catch (error) {

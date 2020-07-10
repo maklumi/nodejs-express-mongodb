@@ -9,7 +9,7 @@ const Bootcamp = require('../models/Bootcamp')
 exports.dapatkanSemuaBootcamps = asyncHandler(async (req, res, next) => {
   const copyOfReqQuery = { ...req.query }
 
-  const bahagianTakPerlu = ['pilih', 'susunan']
+  const bahagianTakPerlu = ['pilih', 'susunan', 'halaman', 'had']
   bahagianTakPerlu.forEach((field) => delete copyOfReqQuery[field])
 
   let queryParametersString = JSON.stringify(copyOfReqQuery)
@@ -39,10 +39,39 @@ exports.dapatkanSemuaBootcamps = asyncHandler(async (req, res, next) => {
     resources = resources.sort('-createdAt') // descending order
   }
 
+  // ?halaman=2&had=3
+  const halaman = parseInt(req.query.halaman, 10) || 1
+  const had = parseInt(req.query.had, 10) || 100
+  const indeksMula = (halaman - 1) * had
+  const indeksAkhir = halaman * had
+
+  resources = resources.skip(indeksMula).limit(had)
+
+  // tambah 'laman ke depan' dan 'laman ke belakang'
+  const mukasurat = {}
+
+  if (indeksMula > 0) {
+    mukasurat.kebelakang = {
+      halaman: halaman - 1,
+      had: had,
+    }
+  }
+
+  const jumlahDokumen = await Bootcamp.estimatedDocumentCount()
+  if (indeksAkhir < jumlahDokumen) {
+    mukasurat.kedepan = {
+      halaman: halaman + 1,
+      had: had,
+    }
+  }
+
   const bootcamps = await resources
-  res
-    .status(200)
-    .json({ berjaya: true, bilangan: bootcamps.length, data: bootcamps })
+  res.status(200).json({
+    berjaya: true,
+    bilangan: bootcamps.length,
+    mukasurat,
+    data: bootcamps,
+  })
 })
 
 // @desc    Dapatkan satu bootcamp dengan id ini

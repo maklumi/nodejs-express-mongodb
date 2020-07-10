@@ -7,7 +7,12 @@ const Bootcamp = require('../models/Bootcamp')
 // @route   GET /api/v1/bootcamps
 // @access  Public
 exports.dapatkanSemuaBootcamps = asyncHandler(async (req, res, next) => {
-  let queryParametersString = JSON.stringify(req.query)
+  const copyOfReqQuery = { ...req.query }
+
+  const bahagianTakPerlu = ['pilih', 'susunan']
+  bahagianTakPerlu.forEach((field) => delete copyOfReqQuery[field])
+
+  let queryParametersString = JSON.stringify(copyOfReqQuery)
 
   queryParametersString = queryParametersString.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
@@ -17,7 +22,24 @@ exports.dapatkanSemuaBootcamps = asyncHandler(async (req, res, next) => {
   // console.log(queryParametersString)
   // in postman, try /api/v1/bootcamps?averageCost[gte]=10000
 
-  const bootcamps = await Bootcamp.find(JSON.parse(queryParametersString))
+  let resources = Bootcamp.find(JSON.parse(queryParametersString))
+
+  // ?pilih=name,description
+  if (req.query.pilih) {
+    const pilihan = req.query.pilih.split(',').join(' ')
+    console.log(pilihan)
+    resources = resources.select(pilihan)
+  }
+
+  // ?..&susunan=name
+  if (req.query.susunan) {
+    const susunString = req.query.susunan.split(',').join(' ')
+    resources = resources.sort(susunString)
+  } else {
+    resources = resources.sort('-createdAt') // descending order
+  }
+
+  const bootcamps = await resources
   res
     .status(200)
     .json({ berjaya: true, bilangan: bootcamps.length, data: bootcamps })

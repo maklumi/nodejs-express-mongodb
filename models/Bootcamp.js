@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const slugify = require('slugify')
+const geocoder = require('../utils/geocoder')
 
 const skimaBootcamp = new mongoose.Schema({
   name: {
@@ -101,6 +102,23 @@ skimaBootcamp.pre('save', function (callnextmiddleware) {
   // console.log('guna slugify ', slugify(this.name))
   this.slug = slugify(this.name, { lower: true })
   callnextmiddleware()
+})
+
+skimaBootcamp.pre('save', async function (next) {
+  const lokasi = await geocoder.geocode(this.address)
+  this.location = {
+    type: 'Point',
+    coordinates: [lokasi[0].longitude, lokasi[0].latitude],
+    formattedAddress: lokasi[0].formattedAddress,
+    street: lokasi[0].streetName,
+    city: lokasi[0].city,
+    state: lokasi[0].stateCode,
+    zipcode: lokasi[0].zipcode,
+    country: lokasi[0].countryCode,
+  }
+  // save except this address because we got location above already
+  this.address = undefined
+  next()
 })
 
 module.exports = mongoose.model('Bootcamp', skimaBootcamp)

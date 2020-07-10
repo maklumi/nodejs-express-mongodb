@@ -1,3 +1,4 @@
+const ErrorResponse = require('../utils/resError')
 const Bootcamp = require('../models/Bootcamp')
 
 // @desc    Dapatkan semua bootcamps
@@ -10,10 +11,7 @@ exports.dapatkanSemuaBootcamps = async (req, res, next) => {
       .status(200)
       .json({ berjaya: true, bilangan: bootcamps.length, data: bootcamps })
   } catch (err) {
-    res.status(400).json({
-      berjaya: false,
-      mesej: 'Gagal dapatkan semua bootcamps' + err.message,
-    })
+    next(err)
   }
 }
 
@@ -24,10 +22,9 @@ exports.dapatkanBootcampDenganId = async (req, res, next) => {
   try {
     const bootcamp = await Bootcamp.findById(req.params.id)
     if (!bootcamp) {
-      return res.status(400).json({
-        berjaya: false,
-        mesej: `Tiada bootcamp dengan id ${req.params.id}`,
-      })
+      return next(
+        new ErrorResponse(`Tiada bootcamp dengan id ${req.params.id}`, 404),
+      )
     }
     res.status(200).json({ berjaya: true, data: bootcamp })
   } catch (err) {
@@ -44,7 +41,7 @@ exports.ciptaBootcamp = async (req, res, next) => {
     // console.log(req.body)
     res.status(201).json({ berjaya: true, data: bootcamp })
   } catch (err) {
-    res.status(400).json({ berjaya: false, mesej: err.message })
+    next(err)
   }
 }
 
@@ -65,10 +62,7 @@ exports.updateBootcamp = async (req, res, next) => {
     }
     res.status(200).json({ berjaya: true, data: bootcamp })
   } catch (err) {
-    res.status(400).json({
-      berjaya: false,
-      mesej: 'Gagal dapatkan bootcamp' + err.message,
-    })
+    next(err)
   }
 }
 
@@ -86,9 +80,6 @@ exports.deleteBootcamp = async (req, res, next) => {
     }
     res.status(200).json({ berjaya: true, data: {} })
   } catch (err) {
-    res.status(400).json({
-      berjaya: false,
-      mesej: 'Gagal padam bootcamp ' + err.message,
-    })
+    next(err)
   }
 }

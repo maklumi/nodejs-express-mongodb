@@ -7,7 +7,17 @@ const Bootcamp = require('../models/Bootcamp')
 // @route   GET /api/v1/bootcamps
 // @access  Public
 exports.dapatkanSemuaBootcamps = asyncHandler(async (req, res, next) => {
-  const bootcamps = await Bootcamp.find()
+  let queryParametersString = JSON.stringify(req.query)
+
+  queryParametersString = queryParametersString.replace(
+    /\b(gt|gte|lt|lte|in)\b/g,
+    (perkataan) => `$${perkataan}`,
+  )
+
+  // console.log(queryParametersString)
+  // in postman, try /api/v1/bootcamps?averageCost[gte]=10000
+
+  const bootcamps = await Bootcamp.find(JSON.parse(queryParametersString))
   res
     .status(200)
     .json({ berjaya: true, bilangan: bootcamps.length, data: bootcamps })

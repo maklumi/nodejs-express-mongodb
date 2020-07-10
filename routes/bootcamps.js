@@ -7,6 +7,7 @@ const {
   ciptaBootcamp,
   updateBootcamp,
   deleteBootcamp,
+  bootcampsDalamRadius,
 } = require('../controllers/bootcamps')
 
 router.route('/').get(dapatkanSemuaBootcamps).post(ciptaBootcamp)
@@ -16,5 +17,7 @@ router
   .get(dapatkanBootcampDenganId)
   .put(updateBootcamp)
   .delete(deleteBootcamp)
+
+router.route('/radius/:zipcode/:distance').get(bootcampsDalamRadius)
 
 module.exports = router

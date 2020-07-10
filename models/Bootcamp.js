@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const slugify = require('slugify')
 
 const skimaBootcamp = new mongoose.Schema({
   name: {
@@ -40,11 +41,9 @@ const skimaBootcamp = new mongoose.Schema({
     type: {
       type: String,
       enum: ['Point'],
-      required: false,
     },
     coordinates: {
       type: [Number],
-      required: false,
       index: '2dsphere',
     },
     formattedAddress: String,
@@ -96,6 +95,12 @@ const skimaBootcamp = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+})
+
+skimaBootcamp.pre('save', function (callnextmiddleware) {
+  // console.log('guna slugify ', slugify(this.name))
+  this.slug = slugify(this.name, { lower: true })
+  callnextmiddleware()
 })
 
 module.exports = mongoose.model('Bootcamp', skimaBootcamp)

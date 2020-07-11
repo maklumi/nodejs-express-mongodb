@@ -18,10 +18,14 @@ app.use(express.json())
 const PORT = process.env.PORT || 5000
 
 const bootcampRoutes = require('./routes/bootcamps')
+const kursusRoutes = require('./routes/courses')
+
 // app.use(logger)
 app.use(morgan('dev'))
 
 app.use('/api/v1/bootcamps', bootcampRoutes)
+app.use('/api/v1/courses', kursusRoutes)
+
 app.use(customErrorHandler)
 
 const pelayan = app.listen(

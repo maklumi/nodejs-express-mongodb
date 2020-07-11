@@ -1,6 +1,12 @@
 const express = require('express')
 const router = express.Router()
 
+// masukkan sekali router untuk resource lain
+const routerKursus = require('./courses')
+
+// re-route ke specific part
+router.use('/:bootcampId/courses', routerKursus)
+
 const {
   dapatkanSemuaBootcamps,
   dapatkanBootcampDenganId,

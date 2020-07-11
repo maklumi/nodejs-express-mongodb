@@ -21,6 +21,7 @@ const PORT = process.env.PORT || 5000
 
 const bootcampRoutes = require('./routes/bootcamps')
 const kursusRoutes = require('./routes/courses')
+const authRoutes = require('./routes/auth')
 
 // app.use(logger)
 app.use(morgan('dev'))
@@ -33,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/api/v1/bootcamps', bootcampRoutes)
 app.use('/api/v1/courses', kursusRoutes)
+app.use('/api/v1/auth', authRoutes)
 
 app.use(customErrorHandler)
 

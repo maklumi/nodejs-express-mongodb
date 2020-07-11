@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router({ mergeParams: true })
+const { protect } = require('../middeware/auth')
 
 const {
   dapatkanSemuaKursus,
@@ -21,8 +22,12 @@ router
     }),
     dapatkanSemuaKursus,
   )
-  .post(ciptaKursus)
+  .post(protect, ciptaKursus)
 
-router.route('/:id').get(dapatkanKursus).put(updateKursus).delete(deleteKursus)
+router
+  .route('/:id')
+  .get(dapatkanKursus)
+  .put(protect, updateKursus)
+  .delete(protect, deleteKursus)
 
 module.exports = router

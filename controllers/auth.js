@@ -60,3 +60,15 @@ const sendTokenToCookie = (user, statusCode, res) => {
     token,
   })
 }
+
+// @desc    Dapatkan pengguna sekarang
+// @route   POST /api/v1/auth/me
+// @access  Private
+exports.siapaSaya = asyncHandler(async (req, res, next) => {
+  const pengguna = await User.findById(req.user.id)
+
+  res.status(200).json({
+    berjaya: true,
+    data: pengguna,
+  })
+})

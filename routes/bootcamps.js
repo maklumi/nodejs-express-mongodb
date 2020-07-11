@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const { protect } = require('../middeware/auth')
 
 // masukkan sekali router untuk resource lain
 const routerKursus = require('./courses')
@@ -23,15 +24,15 @@ const advancedResults = require('../middeware/advancedResults')
 router
   .route('/')
   .get(advancedResults(Bootcamp, 'courses'), dapatkanSemuaBootcamps)
-  .post(ciptaBootcamp)
+  .post(protect, ciptaBootcamp)
 
 router
   .route('/:id')
   .get(dapatkanBootcampDenganId)
-  .put(updateBootcamp)
-  .delete(deleteBootcamp)
+  .put(protect, updateBootcamp)
+  .delete(protect, deleteBootcamp)
 
-router.route('/:id/foto').put(uploadFotoBootcamp)
+router.route('/:id/foto').put(protect, uploadFotoBootcamp)
 
 router.route('/radius/:zipcode/:distance').get(bootcampsDalamRadius)
 

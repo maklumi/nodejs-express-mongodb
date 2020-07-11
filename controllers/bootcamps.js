@@ -22,7 +22,10 @@ exports.dapatkanSemuaBootcamps = asyncHandler(async (req, res, next) => {
   // console.log(queryParametersString)
   // in postman, try /api/v1/bootcamps?averageCost[gte]=10000
 
-  let resources = Bootcamp.find(JSON.parse(queryParametersString))
+  let resources = Bootcamp.find(JSON.parse(queryParametersString)).populate({
+    path: 'courses',
+    select: 'title',
+  })
 
   // ?pilih=name,description
   if (req.query.pilih) {
@@ -119,13 +122,16 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.deleteBootcamp = async (req, res, next) => {
   try {
-    const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id)
+    const bootcamp = await Bootcamp.findById(req.params.id)
     if (!bootcamp) {
       return res.status(400).json({
         berjaya: false,
         mesej: `Tiada bootcamp dengan id ${req.params.id}`,
       })
     }
+
+    bootcamp.remove() //  supaya trigger 'remove' dekat skima
+
     res.status(200).json({ berjaya: true, data: {} })
   } catch (err) {
     next(err)

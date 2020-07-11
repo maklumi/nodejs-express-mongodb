@@ -12,7 +12,10 @@ exports.dapatkanSemuaKursus = asyncHandler(async (req, res, next) => {
   if (req.params.bootcampId) {
     resources = Course.find({ bootcamp: req.params.bootcampId })
   } else {
-    resources = Course.find()
+    resources = Course.find().populate({
+      path: 'bootcamp',
+      select: 'name description',
+    })
   }
 
   const courses = await resources

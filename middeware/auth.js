@@ -34,3 +34,18 @@ exports.protect = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Tiada otoriti', 401))
   }
 })
+
+// Beri akses kepada role
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorResponse(
+          `Role ${req.user.role} Tiada otoriti untuk route ini`,
+          403,
+        ),
+      )
+    }
+    next()
+  }
+}

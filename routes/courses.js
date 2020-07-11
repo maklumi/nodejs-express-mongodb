@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router({ mergeParams: true })
-const { protect } = require('../middeware/auth')
+const { protect, authorize } = require('../middeware/auth')
 
 const {
   dapatkanSemuaKursus,
@@ -22,12 +22,12 @@ router
     }),
     dapatkanSemuaKursus,
   )
-  .post(protect, ciptaKursus)
+  .post(protect, authorize('publisher', 'admin'), ciptaKursus)
 
 router
   .route('/:id')
   .get(dapatkanKursus)
-  .put(protect, updateKursus)
-  .delete(protect, deleteKursus)
+  .put(protect, authorize('publisher', 'admin'), updateKursus)
+  .delete(protect, authorize('publisher', 'admin'), deleteKursus)
 
 module.exports = router

@@ -38,4 +38,39 @@ const SkimaKursus = mongoose.Schema({
   },
 })
 
+SkimaKursus.statics.hargaPurataKursus = async function (bootcampId) {
+  console.log('kira harga purata..'.blue)
+
+  const obj = await this.aggregate([
+    {
+      $match: { bootcamp: bootcampId },
+    },
+    {
+      $group: {
+        _id: '$bootcamp',
+        hargaPurata: { $avg: '$tuition' },
+      },
+    },
+  ])
+
+  console.log(obj)
+  try {
+    await this.model('Bootcamp').findByIdAndUpdate(bootcampId, {
+      averageCost: Math.ceil(obj[0].hargaPurata / 10) * 10,
+    })
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+// kira harga lepas saving
+SkimaKursus.post('save', function () {
+  this.constructor.hargaPurataKursus(this.bootcamp)
+})
+
+// kira harga sebelum padam
+SkimaKursus.pre('remove', function () {
+  this.constructor.hargaPurataKursus(this.bootcamp)
+})
+
 module.exports = mongoose.model('Course', SkimaKursus)

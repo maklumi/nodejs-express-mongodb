@@ -6,6 +6,7 @@ const colors = require('colors')
 const customErrorHandler = require('./middeware/customerror')
 const sambunganDB = require('./config/db')
 const fileupload = require('express-fileupload')
+const cookieparser = require('cookie-parser')
 
 // mesti load env variables dulu
 dotenv.config({ path: './config/config.env' })
@@ -16,6 +17,7 @@ sambunganDB()
 const app = express()
 // guna body parser supaya boleh req.body
 app.use(express.json())
+app.use(cookieparser())
 
 const PORT = process.env.PORT || 5000
 

@@ -17,7 +17,13 @@ const {
   uploadFotoBootcamp,
 } = require('../controllers/bootcamps')
 
-router.route('/').get(dapatkanSemuaBootcamps).post(ciptaBootcamp)
+const Bootcamp = require('../models/Bootcamp')
+const advancedResults = require('../middeware/advancedResults')
+
+router
+  .route('/')
+  .get(advancedResults(Bootcamp, 'courses'), dapatkanSemuaBootcamps)
+  .post(ciptaBootcamp)
 
 router
   .route('/:id')

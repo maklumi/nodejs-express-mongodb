@@ -8,24 +8,16 @@ const Bootcamp = require('../models/Bootcamp')
 // @route   GET /api/v1/bootcamps/:bootcampId/courses
 // @access  Public
 exports.dapatkanSemuaKursus = asyncHandler(async (req, res, next) => {
-  let resources
-
   if (req.params.bootcampId) {
-    resources = Course.find({ bootcamp: req.params.bootcampId })
-  } else {
-    resources = Course.find().populate({
-      path: 'bootcamp',
-      select: 'name description',
+    const resources = await Course.find({ bootcamp: req.params.bootcampId })
+    return res.status(200).json({
+      berjaya: true,
+      bilangan: resources.length,
+      data: resources,
     })
+  } else {
+    res.status(200).json(res.advancedResults)
   }
-
-  const courses = await resources
-
-  res.status(200).json({
-    berjaya: true,
-    bilangan: courses.length,
-    data: courses,
-  })
 })
 
 // @desc    Dapatkan kursus guna id

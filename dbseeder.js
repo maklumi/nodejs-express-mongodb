@@ -30,7 +30,7 @@ const dokumenKursus = JSON.parse(
 const masukdata = async () => {
   try {
     await Bootcamp.create(docs)
-    // await Course.create(dokumenKursus)
+    await Course.create(dokumenKursus)
     console.log('Data sudah dimasukkan...'.green.inverse)
     process.exit()
   } catch (error) {

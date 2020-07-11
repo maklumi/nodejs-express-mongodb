@@ -1,3 +1,4 @@
+const path = require('path')
 const ErrorResponse = require('../utils/resError')
 const asyncHandler = require('../middeware/asyncHandler')
 const geocoder = require('../utils/geocoder')
@@ -161,4 +162,53 @@ exports.bootcampsDalamRadius = asyncHandler(async (req, res, next) => {
     bilangan: bootcamps.length,
     data: bootcamps,
   })
+})
+
+// @desc    upload foto
+// @route   PUT request /api/v1/bootcamps/:id/foto
+// @access  Private
+exports.uploadFotoBootcamp = asyncHandler(async (req, res, next) => {
+  const bootcamp = await Bootcamp.findById(req.params.id)
+
+  if (!bootcamp) {
+    return next(
+      new ErrorResponse(`Tiada bootcamp dengan id ${req.params.id}`, 404),
+    )
+  }
+
+  if (!req.files) {
+    return next(new ErrorResponse('Sila upload gambar', 400))
+  }
+
+  // console.log(req.files)
+  const fotoFile = req.files.foto
+
+  if (!fotoFile.mimetype.startsWith('image')) {
+    return next(new ErrorResponse('Sila upload fail imej', 400))
+  }
+
+  if (fotoFile.size > process.env.MAX_FILE_UPLOAD) {
+    return next(new ErrorResponse('Sila upload imej yang lebih kecil', 400))
+  }
+
+  fotoFile.name = `foto_${bootcamp._id}${path.parse(fotoFile.name).ext}`
+
+  fotoFile.mv(
+    `${process.env.FILE_UPLOAD_PATH}/${fotoFile.name}`,
+    async (err) => {
+      if (err) {
+        console.log(err)
+        return next(new ErrorResponse('Tak boleh upload', 500))
+      }
+
+      await Bootcamp.findByIdAndUpdate(req.params.id, {
+        photo: fotoFile.name,
+      })
+
+      res.status(200).json({
+        berjaya: true,
+        data: fotoFile.name,
+      })
+    },
+  )
 })

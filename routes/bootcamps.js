@@ -14,6 +14,7 @@ const {
   updateBootcamp,
   deleteBootcamp,
   bootcampsDalamRadius,
+  uploadFotoBootcamp,
 } = require('../controllers/bootcamps')
 
 router.route('/').get(dapatkanSemuaBootcamps).post(ciptaBootcamp)
@@ -23,6 +24,8 @@ router
   .get(dapatkanBootcampDenganId)
   .put(updateBootcamp)
   .delete(deleteBootcamp)
+
+router.route('/:id/foto').put(uploadFotoBootcamp)
 
 router.route('/radius/:zipcode/:distance').get(bootcampsDalamRadius)
 

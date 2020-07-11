@@ -39,8 +39,6 @@ const SkimaKursus = mongoose.Schema({
 })
 
 SkimaKursus.statics.hargaPurataKursus = async function (bootcampId) {
-  console.log('kira harga purata..'.blue)
-
   const obj = await this.aggregate([
     {
       $match: { bootcamp: bootcampId },
@@ -53,7 +51,6 @@ SkimaKursus.statics.hargaPurataKursus = async function (bootcampId) {
     },
   ])
 
-  console.log(obj)
   try {
     await this.model('Bootcamp').findByIdAndUpdate(bootcampId, {
       averageCost: Math.ceil(obj[0].hargaPurata / 10) * 10,

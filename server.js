@@ -1,9 +1,11 @@
+const path = require('path')
 const express = require('express')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const colors = require('colors')
 const customErrorHandler = require('./middeware/customerror')
 const sambunganDB = require('./config/db')
+const fileupload = require('express-fileupload')
 
 // mesti load env variables dulu
 dotenv.config({ path: './config/config.env' })
@@ -22,6 +24,12 @@ const kursusRoutes = require('./routes/courses')
 
 // app.use(logger)
 app.use(morgan('dev'))
+
+// upload file guna middleware
+app.use(fileupload())
+
+// buat static folder di public
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/api/v1/bootcamps', bootcampRoutes)
 app.use('/api/v1/courses', kursusRoutes)

@@ -3,9 +3,13 @@ const asyncHandler = require('../middeware/asyncHandler')
 const User = require('../models/User')
 
 // @desc    Daftar pengguna
-// @route   GET /api/v1/auth/daftar
+// @route   POST /api/v1/auth/daftar
 // @access  Public
 exports.daftarPengguna = asyncHandler(async (req, res, next) => {
+  const { name, email, password, role } = req.body
+
+  const pengguna = await User.create({ name, email, password, role })
+
   res.status(200).json({
     berjaya: true,
   })

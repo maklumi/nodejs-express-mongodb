@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
 
 const SkimaPengguna = mongoose.Schema({
   name: {
@@ -31,6 +32,12 @@ const SkimaPengguna = mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+})
+
+// encrypt password sebelum save. Bila create kita dapat capai contentnya
+SkimaPengguna.pre('save', async function (next) {
+  const garam = await bcrypt.genSalt(10)
+  this.password = await bcrypt.hash(this.password, garam)
 })
 
 module.exports = mongoose.model('User', SkimaPengguna)

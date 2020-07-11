@@ -50,7 +50,7 @@ exports.dapatkanKursus = asyncHandler(async (req, res, next) => {
 })
 
 // @desc    cipta kursus dalam bootcamp guna id bootcamp
-// @route   GET /api/v1/bootcamps/:id/courses
+// @route   POST /api/v1/bootcamps/:id/courses
 // @access  Private - hanya yang authenticate boleh cipta
 exports.ciptaKursus = asyncHandler(async (req, res, next) => {
   req.body.bootcamp = req.params.bootcampId
@@ -71,5 +71,47 @@ exports.ciptaKursus = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     berjaya: true,
     data: kursus,
+  })
+})
+
+// @desc    update kursus
+// @route   PUT /api/v1/courses/:id
+// @access  Private
+exports.updateKursus = asyncHandler(async (req, res, next) => {
+  let kursus = await Course.findById(req.params.id)
+
+  if (!kursus) {
+    return next(
+      new ErrorResponse(`Tiada kursus dengan id ${req.params.id}`, 404),
+    )
+  }
+
+  kursus = await Course.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+  res.status(200).json({
+    berjaya: true,
+    data: kursus,
+  })
+})
+
+// @desc    delete kursus
+// @route   DELETE /api/v1/courses/:id
+// @access  Private
+exports.deleteKursus = asyncHandler(async (req, res, next) => {
+  const kursus = await Course.findById(req.params.id)
+
+  if (!kursus) {
+    return next(
+      new ErrorResponse(`Tiada kursus dengan id ${req.params.id}`, 404),
+    )
+  }
+
+  await kursus.remove()
+
+  res.status(200).json({
+    berjaya: true,
+    data: {},
   })
 })

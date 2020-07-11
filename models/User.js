@@ -40,4 +40,12 @@ SkimaPengguna.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, garam)
 })
 
+// sign jwt
+const jwt = require('jsonwebtoken')
+SkimaPengguna.methods.dapatJwtToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_RAHSIA, {
+    expiresIn: process.env.JWT_TAMAT_TEMPOH,
+  })
+}
+
 module.exports = mongoose.model('User', SkimaPengguna)

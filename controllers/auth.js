@@ -10,7 +10,10 @@ exports.daftarPengguna = asyncHandler(async (req, res, next) => {
 
   const pengguna = await User.create({ name, email, password, role })
 
+  const token = pengguna.dapatJwtToken()
+
   res.status(200).json({
     berjaya: true,
+    token,
   })
 })

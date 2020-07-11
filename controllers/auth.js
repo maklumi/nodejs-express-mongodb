@@ -17,3 +17,36 @@ exports.daftarPengguna = asyncHandler(async (req, res, next) => {
     token,
   })
 })
+
+// @desc    Daftar pengguna
+// @route   POST /api/v1/auth/login
+// @access  Public
+exports.loginPengguna = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body
+
+  // validate dulu
+  if (!email || !password) {
+    return next(new ErrorResponse('Sila masukkan email dan password', 400))
+  }
+
+  // tengok ada tak
+  const pengguna = await User.findOne({ email }).select('+password')
+
+  if (!pengguna) {
+    return next(new ErrorResponse('invalid email dan password', 401))
+  }
+
+  // tengok sama tak password
+  const padan = await pengguna.padankanPassword(password)
+
+  if (!padan) {
+    return next(new ErrorResponse('Invalid credentials', 401))
+  }
+
+  const token = pengguna.dapatJwtToken()
+
+  res.status(200).json({
+    berjaya: true,
+    token,
+  })
+})

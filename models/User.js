@@ -48,4 +48,9 @@ SkimaPengguna.methods.dapatJwtToken = function () {
   })
 }
 
+// periksa password
+SkimaPengguna.methods.padankanPassword = async function (katalaluan) {
+  return await bcrypt.compare(katalaluan, this.password)
+}
+
 module.exports = mongoose.model('User', SkimaPengguna)

@@ -55,6 +55,42 @@ exports.siapaSaya = asyncHandler(async (req, res, next) => {
   })
 })
 
+// @desc    Update details pengguna
+// @route   PUT /api/v1/auth/updatedetails
+// @access  Private
+exports.updateDetailsPengguna = asyncHandler(async (req, res, next) => {
+  const perkaraDiupdate = {
+    name: req.body.name,
+    email: req.body.email,
+  }
+
+  const pengguna = await User.findByIdAndUpdate(req.user.id, perkaraDiupdate, {
+    new: true,
+    runValidators: true,
+  })
+
+  res.status(200).json({
+    berjaya: true,
+    data: pengguna,
+  })
+})
+
+// @desc    Update password pengguna
+// @route   PUT /api/v1/auth/updatedetails
+// @access  Private
+exports.updatePasswordPengguna = asyncHandler(async (req, res, next) => {
+  const pengguna = await User.findById(req.user.id).select('+password')
+
+  if (!(await pengguna.padankanPassword(req.body.currentPassword))) {
+    return next(new ErrorResponse('Password salah', 401))
+  }
+
+  pengguna.password = req.body.newPassword
+  await pengguna.save()
+
+  sendTokenToCookie(pengguna, 200, res)
+})
+
 // @desc    Lupa password
 // @route   POST /api/v1/auth/lupapassword
 // @access  Public

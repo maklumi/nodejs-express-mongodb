@@ -5,6 +5,8 @@ const {
   siapaSaya,
   lupaPassword,
   resetPassword,
+  updateDetailsPengguna,
+  updatePasswordPengguna,
 } = require('../controllers/auth')
 
 const { protect } = require('../middeware/auth')
@@ -16,5 +18,7 @@ router.post('/daftar', daftarPengguna)
 router.post('/lupapassword', lupaPassword)
 router.get('/me', protect, siapaSaya)
 router.put('/resetpassword/:resettoken', resetPassword)
+router.put('/updatedetails', protect, updateDetailsPengguna)
+router.put('/updatepassword', protect, updatePasswordPengguna)
 
 module.exports = router

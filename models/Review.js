@@ -33,4 +33,7 @@ const SkimaReview = mongoose.Schema({
   },
 })
 
+// Hanya boleh buat satu review untuk satu bootcamp
+SkimaReview.index({ bootcamp: 1, user: 1 }, { unique: true })
+
 module.exports = mongoose.model('Review', SkimaReview)

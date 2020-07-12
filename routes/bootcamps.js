@@ -4,9 +4,11 @@ const { protect, authorize } = require('../middeware/auth')
 
 // masukkan sekali router untuk resource lain
 const routerKursus = require('./courses')
+const routerReview = require('./reviews')
 
 // re-route ke specific part
 router.use('/:bootcampId/courses', routerKursus)
+router.use('/:bootcampId/reviews', routerReview)
 
 const {
   dapatkanSemuaBootcamps,

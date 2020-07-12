@@ -25,6 +25,7 @@ const bootcampRoutes = require('./routes/bootcamps')
 const kursusRoutes = require('./routes/courses')
 const authRoutes = require('./routes/auth')
 const adminRoutes = require('./routes/users')
+const reviewsRoutes = require('./routes/reviews')
 
 // app.use(logger)
 app.use(morgan('dev'))
@@ -39,6 +40,7 @@ app.use('/api/v1/bootcamps', bootcampRoutes)
 app.use('/api/v1/courses', kursusRoutes)
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', adminRoutes)
+app.use('/api/v1/reviews', reviewsRoutes)
 
 app.use(customErrorHandler)
 

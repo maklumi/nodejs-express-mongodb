@@ -41,6 +41,40 @@ exports.loginPengguna = asyncHandler(async (req, res, next) => {
   sendTokenToCookie(pengguna, 200, res)
 })
 
+// @desc    Dapatkan pengguna sekarang
+// @route   POST /api/v1/auth/me
+// @access  Private
+exports.siapaSaya = asyncHandler(async (req, res, next) => {
+  const pengguna = await User.findById(req.user.id)
+
+  res.status(200).json({
+    berjaya: true,
+    data: pengguna,
+  })
+})
+
+// @desc    Lupa password
+// @route   POST /api/v1/auth/lupapassword
+// @access  Public
+exports.lupaPassword = asyncHandler(async (req, res, next) => {
+  const pengguna = await User.findOne({ email: req.body.email })
+
+  if (!pengguna) {
+    return next(
+      new ErrorResponse(`Tiada pengguna dengan emel ${req.body.email}`, 404),
+    )
+  }
+
+  const resetToken = pengguna.buatResetPasswordToken()
+
+  await pengguna.save({ validateBeforeSave: false })
+
+  res.status(200).json({
+    berjaya: true,
+    data: pengguna,
+  })
+})
+
 const sendTokenToCookie = (user, statusCode, res) => {
   const token = user.dapatJwtToken()
 
@@ -60,15 +94,3 @@ const sendTokenToCookie = (user, statusCode, res) => {
     token,
   })
 }
-
-// @desc    Dapatkan pengguna sekarang
-// @route   POST /api/v1/auth/me
-// @access  Private
-exports.siapaSaya = asyncHandler(async (req, res, next) => {
-  const pengguna = await User.findById(req.user.id)
-
-  res.status(200).json({
-    berjaya: true,
-    data: pengguna,
-  })
-})

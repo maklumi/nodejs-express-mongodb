@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 
@@ -36,6 +37,10 @@ const SkimaPengguna = mongoose.Schema({
 
 // encrypt password sebelum save. Bila create kita dapat capai contentnya
 SkimaPengguna.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next()
+  }
+
   const garam = await bcrypt.genSalt(10)
   this.password = await bcrypt.hash(this.password, garam)
 })
@@ -51,6 +56,20 @@ SkimaPengguna.methods.dapatJwtToken = function () {
 // periksa password
 SkimaPengguna.methods.padankanPassword = async function (katalaluan) {
   return await bcrypt.compare(katalaluan, this.password)
+}
+
+// Buat password token
+SkimaPengguna.methods.buatResetPasswordToken = function () {
+  const resetToken = crypto.randomBytes(20).toString('hex')
+
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex')
+
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000
+
+  return resetToken
 }
 
 module.exports = mongoose.model('User', SkimaPengguna)

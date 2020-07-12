@@ -52,16 +52,30 @@ exports.ciptaBootcamp = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/bootcamps/:id
 // @access  Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  })
+  let bootcamp = await Bootcamp.findById(req.params.id)
+
   if (!bootcamp) {
     return res.status(400).json({
       berjaya: false,
       mesej: `Tiada bootcamp dengan id ${req.params.id}`,
     })
   }
+
+  // hanya owner bootcamp boleh update
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Pengguna id ${req.user.id} tiada otoriti untuk update`,
+        401,
+      ),
+    )
+  }
+
+  bootcamp = await Bootcamp.findOneAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+
   res.status(200).json({ berjaya: true, data: bootcamp })
 })
 
@@ -77,6 +91,16 @@ exports.deleteBootcamp = async (req, res, next) => {
         berjaya: false,
         mesej: `Tiada bootcamp dengan id ${req.params.id}`,
       })
+    }
+
+    // hanya owner bootcamp boleh update
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+      return next(
+        new ErrorResponse(
+          `Pengguna id ${req.user.id} tiada otoriti untuk padam`,
+          401,
+        ),
+      )
     }
 
     bootcamp.remove() //  supaya trigger 'remove' dekat skima
@@ -121,6 +145,16 @@ exports.uploadFotoBootcamp = asyncHandler(async (req, res, next) => {
   if (!bootcamp) {
     return next(
       new ErrorResponse(`Tiada bootcamp dengan id ${req.params.id}`, 404),
+    )
+  }
+
+  // hanya owner bootcamp boleh update
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Pengguna id ${req.user.id} tiada otoriti untuk update gambar`,
+        401,
+      ),
     )
   }
 

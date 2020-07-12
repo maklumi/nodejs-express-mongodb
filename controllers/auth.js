@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const ErrorResponse = require('../utils/resError')
 const asyncHandler = require('../middeware/asyncHandler')
 const hantarEmel = require('../utils/hantarEmel')
@@ -73,7 +74,7 @@ exports.lupaPassword = asyncHandler(async (req, res, next) => {
   // reset url
   const resetUrl = `${req.protocol}://${req.get(
     'host',
-  )}/api/v1/resetPassword/${resetToken}`
+  )}/api/v1/auth/resetpassword/${resetToken}`
 
   const message = `Sila pergi ke ${resetUrl} untuk reset password`
 
@@ -97,6 +98,35 @@ exports.lupaPassword = asyncHandler(async (req, res, next) => {
 
     return next(new ErrorResponse('Tidak dapat hantar emel', 500))
   }
+})
+
+// @desc    Reset password
+// @route   PUT /api/v1/auth/resetpassword/:resettoken
+// @access  Public
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.resettoken)
+    .digest('hex')
+
+  const pengguna = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpire: {
+      $gt: Date.now(),
+    },
+  })
+
+  if (!pengguna) {
+    return next(new ErrorResponse('Token tak valid', 400))
+  }
+
+  // set password baru
+  pengguna.password = req.body.password
+  pengguna.resetPasswordToken = undefined
+  pengguna.resetPasswordExpire = undefined
+  await pengguna.save()
+
+  sendTokenToCookie(pengguna, 200, res)
 })
 
 const sendTokenToCookie = (user, statusCode, res) => {

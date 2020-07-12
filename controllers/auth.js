@@ -1,5 +1,6 @@
 const ErrorResponse = require('../utils/resError')
 const asyncHandler = require('../middeware/asyncHandler')
+const hantarEmel = require('../utils/hantarEmel')
 const User = require('../models/User')
 
 // @desc    Daftar pengguna
@@ -69,10 +70,33 @@ exports.lupaPassword = asyncHandler(async (req, res, next) => {
 
   await pengguna.save({ validateBeforeSave: false })
 
-  res.status(200).json({
-    berjaya: true,
-    data: pengguna,
-  })
+  // reset url
+  const resetUrl = `${req.protocol}://${req.get(
+    'host',
+  )}/api/v1/resetPassword/${resetToken}`
+
+  const message = `Sila pergi ke ${resetUrl} untuk reset password`
+
+  try {
+    await hantarEmel({
+      email: pengguna.email,
+      subject: 'Password rese token',
+      message,
+    })
+
+    res.status(200).json({
+      berjaya: true,
+      data: 'Email dihantar',
+    })
+  } catch (err) {
+    console.log(err)
+    pengguna.resetPasswordToken = undefined
+    pengguna.resetPasswordExpire = undefined
+
+    await pengguna.save({ validateBeforeSave: false })
+
+    return next(new ErrorResponse('Tidak dapat hantar emel', 500))
+  }
 })
 
 const sendTokenToCookie = (user, statusCode, res) => {

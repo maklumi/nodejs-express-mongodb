@@ -28,6 +28,21 @@ exports.dapatkanBootcampDenganId = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/bootcamps
 // @access  Private
 exports.ciptaBootcamp = asyncHandler(async (req, res, next) => {
+  // selepas tambah user dalam skima bootcamp,
+  req.body.user = req.user.id
+
+  // pastikan publisher hanya boleh cipta satu
+  const kursusDariUserIni = await Bootcamp.findOne({ user: req.user.id })
+
+  if (!kursusDariUserIni && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Pengguna dengan id ${req.user.id} sudah ada kursus`,
+        400,
+      ),
+    )
+  }
+
   const bootcamp = await Bootcamp.create(req.body)
   // console.log(req.body)
   res.status(201).json({ berjaya: true, data: bootcamp })

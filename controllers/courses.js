@@ -46,6 +46,7 @@ exports.dapatkanKursus = asyncHandler(async (req, res, next) => {
 // @access  Private - hanya yang authenticate boleh cipta
 exports.ciptaKursus = asyncHandler(async (req, res, next) => {
   req.body.bootcamp = req.params.bootcampId
+  req.body.user = req.user.id
 
   const bootcamp = await Bootcamp.findById(req.params.bootcampId)
 
@@ -54,6 +55,16 @@ exports.ciptaKursus = asyncHandler(async (req, res, next) => {
       new ErrorResponse(
         `Tiada bootcamp dengan id ${req.params.bootcampId}`,
         404,
+      ),
+    )
+  }
+
+  // hanya owner bootcamp boleh update
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Pengguna id ${req.user.id} tiada otoriti untuk cipta kursus dalam bootcamp ${req.params.bootcampId}`,
+        401,
       ),
     )
   }
@@ -78,6 +89,16 @@ exports.updateKursus = asyncHandler(async (req, res, next) => {
     )
   }
 
+  // hanya owner bootcamp boleh update
+  if (kursus.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Pengguna id ${req.user.id} tiada otoriti untuk update kursus`,
+        401,
+      ),
+    )
+  }
+
   kursus = await Course.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -97,6 +118,16 @@ exports.deleteKursus = asyncHandler(async (req, res, next) => {
   if (!kursus) {
     return next(
       new ErrorResponse(`Tiada kursus dengan id ${req.params.id}`, 404),
+    )
+  }
+
+  // hanya owner bootcamp boleh delete
+  if (kursus.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Pengguna id ${req.user.id} tiada otoriti untuk delete kursus`,
+        401,
+      ),
     )
   }
 

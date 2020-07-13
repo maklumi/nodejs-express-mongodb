@@ -7,6 +7,11 @@ const customErrorHandler = require('./middeware/customerror')
 const sambunganDB = require('./config/db')
 const fileupload = require('express-fileupload')
 const cookieparser = require('cookie-parser')
+const sanitize = require('express-mongo-sanitize')
+const helmet = require('helmet')
+const xssclean = require('xss-clean')
+const rateLimit = require('express-rate-limit')
+const hpp = require('hpp')
 
 // mesti load env variables dulu
 dotenv.config({ path: './config/config.env' })
@@ -32,6 +37,18 @@ app.use(morgan('dev'))
 
 // upload file guna middleware
 app.use(fileupload())
+
+// sanitize data
+app.use(sanitize())
+// secure headers
+app.use(helmet())
+// prevent scripting xss
+app.use(xssclean())
+// rate limit request
+const limiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 100 })
+app.use(limiter)
+// prevent http param pollution
+app.use(hpp())
 
 // buat static folder di public
 app.use(express.static(path.join(__dirname, 'public')))

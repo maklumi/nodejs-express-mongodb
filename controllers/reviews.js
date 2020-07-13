@@ -65,3 +65,56 @@ exports.addReview = asyncHandler(async (req, res, next) => {
     data: review,
   })
 })
+
+// @desc    Update review
+// @route   PUT /api/v1/reviews/:id
+// @access  Private
+exports.updateReview = asyncHandler(async (req, res, next) => {
+  let review = await Review.findById(req.params.id)
+
+  if (!review) {
+    return next(
+      new ErrorResponse(`Tiada review dengan id ${req.params.id}`, 404),
+    )
+  }
+
+  // pastikan review user punya dan user is admin
+  if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`Tiada otoriti untuk update`, 401))
+  }
+
+  review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+
+  res.status(201).json({
+    berjaya: true,
+    data: review,
+  })
+})
+
+// @desc    Delete review
+// @route   DELETE /api/v1/reviews/:id
+// @access  Private
+exports.deleteReview = asyncHandler(async (req, res, next) => {
+  const review = await Review.findById(req.params.id)
+
+  if (!review) {
+    return next(
+      new ErrorResponse(`Tiada review dengan id ${req.params.id}`, 404),
+    )
+  }
+
+  // pastikan review user punya dan user is admin
+  if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`Tiada otoriti untuk delete`, 401))
+  }
+
+  await review.remove()
+
+  res.status(201).json({
+    berjaya: true,
+    data: {},
+  })
+})
